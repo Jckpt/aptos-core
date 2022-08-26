@@ -21,7 +21,11 @@ if [ "$CI" == "true" ]; then
   # builder target is the one that builds the rust binaries and is the most expensive.
   # Its output is used by all the other targets that follow.
   # This will also push the builder image as an image to GCP (+ inline cache manifests) even though we don't use this image directly
-  TARGET_REGISTRY=gcp docker buildx bake --progress=plain --file docker/docker-bake-rust-all.hcl builder --push
+  TARGET_REGISTRY=gcp docker buildx bake --progress=plain --file docker/docker-bake-rust-all.hcl builder-base --push
+  TARGET_REGISTRY=gcp docker buildx bake --progress=plain --file docker/docker-bake-rust-all.hcl builder-release --push
+  TARGET_REGISTRY=gcp docker buildx bake --progress=plain --file docker/docker-bake-rust-all.hcl builder-debug --push
+  TARGET_REGISTRY=gcp docker buildx bake --progress=plain --file docker/docker-bake-rust-all.hcl builder-perf --push
+
   # build and push the actual images that we use (+ inline cache manifests)
   TARGET_REGISTRY=gcp docker buildx bake --progress=plain --file docker/docker-bake-rust-all.hcl all --push
   # push everything also to AWS - this step will literally just reuse the layers from the previous step so should be kinda fast

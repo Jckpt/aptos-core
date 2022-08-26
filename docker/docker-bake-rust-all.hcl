@@ -41,13 +41,58 @@ variable "normalized_branch_or_pr" {
   default = regex_replace("${TARGET_CACHE_ID}", "[^a-zA-Z0-9]", "-")
 }
 
-target "builder" {
-  target     = "builder"
+target "builder-base" {
+  target     = "builder-base"
   dockerfile = "docker/rust-all.Dockerfile"
   context    = "."
-  cache-from = generate_cache_from("builder")
-  cache-to   = generate_cache_to("builder")
-  tags       = generate_tags("builder")
+  cache-from = generate_cache_from("builder-base")
+  cache-to   = generate_cache_to("builder-base")
+  tags       = generate_tags("builder-base")
+  args       = {
+    GIT_SHA         = "${GIT_SHA}"
+    GIT_BRANCH      = "${GIT_BRANCH}"
+    GIT_TAG         = "${GIT_TAG}"
+    BUILT_VIA_BUILDKIT = "true"
+  }
+}
+
+target "builder-release" {
+  target     = "builder-release"
+  dockerfile = "docker/rust-all.Dockerfile"
+  context    = "."
+  cache-from = generate_cache_from("builder-release")
+  cache-to   = generate_cache_to("builder-release")
+  tags       = generate_tags("builder-release")
+  args       = {
+    GIT_SHA         = "${GIT_SHA}"
+    GIT_BRANCH      = "${GIT_BRANCH}"
+    GIT_TAG         = "${GIT_TAG}"
+    BUILT_VIA_BUILDKIT = "true"
+  }
+}
+
+target "builder-debug" {
+  target     = "builder-debug"
+  dockerfile = "docker/rust-all.Dockerfile"
+  context    = "."
+  cache-from = generate_cache_from("builder-debug")
+  cache-to   = generate_cache_to("builder-debug")
+  tags       = generate_tags("builder-debug")
+  args       = {
+    GIT_SHA         = "${GIT_SHA}"
+    GIT_BRANCH      = "${GIT_BRANCH}"
+    GIT_TAG         = "${GIT_TAG}"
+    BUILT_VIA_BUILDKIT = "true"
+  }
+}
+
+target "builder-perf" {
+  target     = "builder-perf"
+  dockerfile = "docker/rust-all.Dockerfile"
+  context    = "."
+  cache-from = generate_cache_from("builder-perf")
+  cache-to   = generate_cache_to("builder-perf")
+  tags       = generate_tags("builder-perf")
   args       = {
     GIT_SHA         = "${GIT_SHA}"
     GIT_BRANCH      = "${GIT_BRANCH}"
@@ -101,6 +146,20 @@ target "validator" {
   target   = "validator"
   cache-to = generate_cache_to("validator")
   tags     = generate_tags("validator")
+}
+
+target "validator-debug" {
+  inherits = ["_common"]
+  target   = "validator-debug"
+  cache-to = generate_cache_to("validator-debug")
+  tags     = generate_tags("validator-debug")
+}
+
+target "validator-perf" {
+  inherits = ["_common"]
+  target   = "validator-perf"
+  cache-to = generate_cache_to("validator-perf")
+  tags     = generate_tags("validator-perf")
 }
 
 target "indexer" {
