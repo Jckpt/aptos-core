@@ -51,6 +51,7 @@ pub struct AptosVMImpl {
     metadata_cache: DashMap<ModuleId, Option<RuntimeModuleMetadata>>,
 }
 
+
 impl AptosVMImpl {
     #[allow(clippy::new_without_default)]
     pub fn new<S: StateView>(state: &S) -> Self {
