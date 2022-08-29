@@ -23,7 +23,7 @@ name: "Build+Push Images"
 on: # build on main branch OR when a PR is labeled with `CICD:build-images`
   # Allow us to run this specific workflow without a PR
   workflow_dispatch:
-  pull_request_target:
+  pull_request:
     types: [labeled, opened, synchronize, reopened, auto_merge_enabled]
   push:
     branches:
@@ -118,10 +118,19 @@ jobs:
 
       - uses: ./.github/actions/docker-buildx-setup
 
-      - name: Build and Push Rust images
+      - name: Build and Push Rust images to GCP
         run: docker/docker-bake-rust-all.sh
         env:
           LAST_GREEN_COMMIT: ${{ needs.determine-last-green-commit.outputs.lastGreenCommit }}
+
+      - uses: imjasonh/setup-crane@v0.1
+
+      - name: Mirror images from GCP to AWS
+        run: docker/copy-rust-images-to-registry.sh
+        env:
+          SOURCE_REGISTRY_BASE: ${{ secrets.GCP_DOCKER_ARTIFACT_REPO }}
+          TARGET_REGISTRY_BASE: ${{ secrets.ENV_ECR_AWS_ACCOUNT_NUM }}.dkr.ecr.us-west-2.amazonaws.com/aptos
+          IMAGE_TAG: ${{ env.GIT_SHA }}
 
   sdk-release:
     needs: rust-images
