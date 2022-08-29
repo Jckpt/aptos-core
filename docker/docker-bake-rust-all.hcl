@@ -165,8 +165,8 @@ function "generate_tags" {
   result = TARGET_REGISTRY == "gcp" ? [
     "${GCP_DOCKER_ARTIFACT_REPO}/${target}:${GIT_SHA}",
     "${GCP_DOCKER_ARTIFACT_REPO}/${target}:${normalized_branch_or_pr}",
-    ] : TARGET_REGISTRY == "aws" ? [
     "${ecr_base}/${target}:${GIT_SHA}",
+    ] : TARGET_REGISTRY == "aws" ? [
     ] : [
     "aptos-core/${target}:${GIT_SHA}-from-local",
     "aptos-core/${target}:from-local",
